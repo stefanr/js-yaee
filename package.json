@@ -1,0 +1,42 @@
+{
+  "name": "yaee",
+  "version": "0.1.0",
+  "description": "Yet Another EventEmitter",
+  "keywords": [
+    "event",
+    "events",
+    "eventemitter",
+    "emitter"
+  ],
+  "author": {
+    "name": "Stefan Rumzucker",
+    "email": "rumzucker@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stefanr/yaee.git"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": "^0.12.7",
+    "iojs": "^2.3.4"
+  },
+  "main": "yaee.js",
+  "devDependencies": {
+    "babel": "^5.6.14",
+    "gulp": "^3.9.0",
+    "gulp-babel": "^5.1.0"
+  },
+  "jspm": {
+    "main": "yaee",
+    "format": "system",
+    "directories": {
+      "lib": "dist/system"
+    },
+    "devDependencies": {
+      "babel": "npm:babel-core@^5.6.14",
+      "babel-runtime": "npm:babel-runtime@^5.6.14",
+      "core-js": "npm:core-js@^0.9.18"
+    }
+  }
+}
