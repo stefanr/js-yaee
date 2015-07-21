@@ -1,6 +1,6 @@
 {
   "name": "yaee",
-  "version": "0.1.0",
+  "version": "0.1.1-beta.1",
   "description": "Yet Another EventEmitter",
   "keywords": [
     "event",
@@ -21,11 +21,11 @@
     "node": "^0.12.7",
     "iojs": "^2.3.4"
   },
-  "main": "yaee.js",
   "devDependencies": {
     "babel": "^5.6.14",
     "gulp": "^3.9.0",
-    "gulp-babel": "^5.1.0"
+    "gulp-babel": "^5.1.0",
+    "object.assign": "^3.0.1"
   },
   "jspm": {
     "main": "yaee",

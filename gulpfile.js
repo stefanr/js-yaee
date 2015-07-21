@@ -8,8 +8,9 @@ var assign = Object.assign || require("object.assign");
 var babelOptions = {
   stage: 2,
   optional: [
-    "es7.decorators",
     "es7.classProperties",
+    "es7.decorators",
+    "es7.functionBind",
   ],
 };
 
