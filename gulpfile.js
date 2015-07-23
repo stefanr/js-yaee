@@ -2,7 +2,9 @@
  * Yet Another EventEmitter
  * Gulpfile
  */
-require("core-js");
+process.env.BABEL_ENV = "gulp";
+require("babel/register");
+
 var gulp = require("gulp");
 
 var babelOptions = {

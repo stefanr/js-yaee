@@ -23,6 +23,7 @@ class EventEmitter {
     if (typeof listener !== "function") {
       throw new TypeError("Listener must be callable");
     }
+
     let typedListeners = __listeners__.get(this);
     if (typedListeners instanceof Map) {
       let listeners = typedListeners.get(type);
@@ -53,12 +54,13 @@ class EventEmitter {
 
   dispatchEvent(event) {
     if (!event) {
-      throw new Error("Event must not be undefined");
+      throw new Error("Event must be an object");
     }
     if (!event.type) {
       throw new Error("Missing event type");
     }
-    event.defineProperty("emitter", this);
+    Event.prototype.defineProperty.call(event, "emitter", this);
+
     let typedListeners = __listeners__.get(this);
     if (typedListeners instanceof Map) {
       let listeners = typedListeners.get(event.type);
@@ -92,24 +94,36 @@ export { EventEmitter };
 
 class Event {
 
+  type = null;
   emitter = null;
-  defaultPrevented = false;
 
-  constructor(type, eventInit) {
+  defaultPrevented = false;
+  propagationStopped = false;
+
+  constructor(type, init) {
     this.defineProperty("type", type);
   }
 
   defineProperty(name, value) {
     Object.defineProperty(this, name, {
-      value: value,
-      enumerable: true
+      configurable: true,
+      enumerable: true,
+      value: value
     });
   }
 
   preventDefault() {
-    if (!this.defaultPrevented) {
-      this.defineProperty("defaultPrevented", true);
+    if (this.defaultPrevented) {
+      return;
     }
+    this.defineProperty("defaultPrevented", true);
+  }
+
+  stopPropagation() {
+    if (this.propagationStopped) {
+      return;
+    }
+    this.defineProperty("propagationStopped", true);
   }
 }
 
@@ -121,9 +135,9 @@ export { Event };
 
 class CustomEvent extends Event {
 
-  constructor(type, eventInit) {
-    super(type, eventInit);
-    this.defineProperty("detail", eventInit && eventInit.detail);
+  constructor(type, init) {
+    super(type, init);
+    this.defineProperty("detail", init && init.detail || null);
   }
 }
 

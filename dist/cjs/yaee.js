@@ -36,6 +36,7 @@ var EventEmitter = (function () {
       if (typeof listener !== "function") {
         throw new TypeError("Listener must be callable");
       }
+
       var typedListeners = __listeners__.get(this);
       if (typedListeners instanceof Map) {
         var listeners = typedListeners.get(type);
@@ -68,12 +69,13 @@ var EventEmitter = (function () {
     key: "dispatchEvent",
     value: function dispatchEvent(event) {
       if (!event) {
-        throw new Error("Event must not be undefined");
+        throw new Error("Event must be an object");
       }
       if (!event.type) {
         throw new Error("Missing event type");
       }
-      event.defineProperty("emitter", this);
+      Event.prototype.defineProperty.call(event, "emitter", this);
+
       var typedListeners = __listeners__.get(this);
       if (typedListeners instanceof Map) {
         var listeners = typedListeners.get(event.type);
@@ -120,11 +122,13 @@ exports.EventEmitter = EventEmitter;
  */
 
 var Event = (function () {
-  function Event(type, eventInit) {
+  function Event(type, init) {
     _classCallCheck(this, Event);
 
+    this.type = null;
     this.emitter = null;
     this.defaultPrevented = false;
+    this.propagationStopped = false;
 
     this.defineProperty("type", type);
   }
@@ -133,16 +137,26 @@ var Event = (function () {
     key: "defineProperty",
     value: function defineProperty(name, value) {
       Object.defineProperty(this, name, {
-        value: value,
-        enumerable: true
+        configurable: true,
+        enumerable: true,
+        value: value
       });
     }
   }, {
     key: "preventDefault",
     value: function preventDefault() {
-      if (!this.defaultPrevented) {
-        this.defineProperty("defaultPrevented", true);
+      if (this.defaultPrevented) {
+        return;
       }
+      this.defineProperty("defaultPrevented", true);
+    }
+  }, {
+    key: "stopPropagation",
+    value: function stopPropagation() {
+      if (this.propagationStopped) {
+        return;
+      }
+      this.defineProperty("propagationStopped", true);
     }
   }]);
 
@@ -158,11 +172,11 @@ exports.Event = Event;
 var CustomEvent = (function (_Event) {
   _inherits(CustomEvent, _Event);
 
-  function CustomEvent(type, eventInit) {
+  function CustomEvent(type, init) {
     _classCallCheck(this, CustomEvent);
 
-    _get(Object.getPrototypeOf(CustomEvent.prototype), "constructor", this).call(this, type, eventInit);
-    this.defineProperty("detail", eventInit && eventInit.detail);
+    _get(Object.getPrototypeOf(CustomEvent.prototype), "constructor", this).call(this, type, init);
+    this.defineProperty("detail", init && init.detail || null);
   }
 
   return CustomEvent;

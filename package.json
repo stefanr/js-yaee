@@ -23,7 +23,6 @@
   },
   "devDependencies": {
     "babel": "^5.8.0",
-    "core-js": "^1.0.0",
     "gulp": "^3.9.0",
     "gulp-babel": "^5.1.0"
   },

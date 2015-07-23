@@ -20,6 +20,7 @@ export class EventEmitter {
     if (typeof listener !== "function") {
       throw new TypeError("Listener must be callable");
     }
+
     let typedListeners = __listeners__.get(this);
     if (typedListeners instanceof Map) {
       let listeners = typedListeners.get(type);
@@ -50,12 +51,13 @@ export class EventEmitter {
 
   dispatchEvent(event: Event): boolean {
     if (!event) {
-      throw new Error("Event must not be undefined");
+      throw new Error("Event must be an object");
     }
     if (!event.type) {
       throw new Error("Missing event type");
     }
-    event.defineProperty("emitter", this);
+    Event.prototype.defineProperty.call(event, "emitter", this);
+
     let typedListeners = __listeners__.get(this);
     if (typedListeners instanceof Map) {
       let listeners = typedListeners.get(event.type);
@@ -86,26 +88,36 @@ export class EventEmitter {
  */
 export class Event {
 
-  type: string;
-
+  type: string = null;
   emitter: any = null;
-  defaultPrevented: boolean = false;
 
-  constructor(type: string, eventInit: object) {
+  defaultPrevented: boolean = false;
+  propagationStopped: boolean = false;
+
+  constructor(type: string, init: object) {
     this.defineProperty("type", type);
   }
 
   defineProperty(name: string, value: any): void {
     Object.defineProperty(this, name, {
-      value: value,
+      configurable: true,
       enumerable: true,
+      value: value,
     });
   }
 
   preventDefault(): void {
-    if (!this.defaultPrevented) {
-      this.defineProperty("defaultPrevented", true);
+    if (this.defaultPrevented) {
+      return;
     }
+    this.defineProperty("defaultPrevented", true);
+  }
+
+  stopPropagation(): void {
+    if (this.propagationStopped) {
+      return;
+    }
+    this.defineProperty("propagationStopped", true);
   }
 }
 
@@ -116,8 +128,8 @@ export class CustomEvent extends Event {
 
   detail: any;
 
-  constructor(type: string, eventInit: object) {
-    super(type, eventInit);
-    this.defineProperty("detail", eventInit && eventInit.detail);
+  constructor(type: string, init: object) {
+    super(type, init);
+    this.defineProperty("detail", (init && init.detail) || null);
   }
 }
