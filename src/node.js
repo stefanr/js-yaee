@@ -6,9 +6,12 @@
 /**
  * shim
  */
-export function shim(EventEmitter: object): void {
+export function shim(EventEmitter: callable): void {
   let events = require("events");
 
+  if (events.EventEmitter.prototype instanceof EventEmitter) {
+    return;
+  }
   Object.setPrototypeOf(events.EventEmitter.prototype, EventEmitter.prototype);
 
   events.EventEmitter.prototype.on = ((on) => {

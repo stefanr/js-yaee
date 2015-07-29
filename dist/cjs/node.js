@@ -16,6 +16,9 @@ exports.shim = shim;
 function shim(EventEmitter) {
   var events = require("events");
 
+  if (events.EventEmitter.prototype instanceof EventEmitter) {
+    return;
+  }
   Object.setPrototypeOf(events.EventEmitter.prototype, EventEmitter.prototype);
 
   events.EventEmitter.prototype.on = (function (on) {
