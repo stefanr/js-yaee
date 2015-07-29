@@ -1,33 +1,46 @@
 /*
  * Yet Another EventEmitter
- * Node.js EventEmitter Shim
+ * Node.js
  */
-module.exports = function (yaee) {
+
+/**
+ * shim
+ */
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.shim = shim;
+
+function shim(EventEmitter) {
   var events = require("events");
 
-  Object.setPrototypeOf(events.EventEmitter.prototype, yaee.EventEmitter.prototype);
+  Object.setPrototypeOf(events.EventEmitter.prototype, EventEmitter.prototype);
 
   events.EventEmitter.prototype.on = (function (on) {
     return function () {
-      yaee.EventEmitter.prototype.on.apply(this, arguments);
+      EventEmitter.prototype.on.apply(this, arguments);
       return on.apply(this, arguments);
     };
   })(events.EventEmitter.prototype.on);
 
   events.EventEmitter.prototype.once = function once(type, listener) {
+    var _this = this,
+        _arguments = arguments;
+
     if (typeof listener !== "function") {
       throw new TypeError("Listener must be callable");
     }
-    var self = this;
     var fired = false;
-    function g() {
+    var g = function g() {
       if (!fired) {
         fired = true;
-        listener.apply(self, arguments);
-        events.EventEmitter.prototype.removeListener.call(self, type, g);
+        listener.apply(_this, _arguments);
+        events.EventEmitter.prototype.removeListener.call(_this, type, g);
       }
-    }
+    };
     g.listener = listener;
     return events.EventEmitter.prototype.on.call(this, type, g);
   };
-};
+}
