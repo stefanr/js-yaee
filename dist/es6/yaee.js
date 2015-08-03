@@ -58,6 +58,14 @@ function addEventListener(emitter, type, listener) {
   if (typeof listener !== "function") {
     throw new TypeError("Listener must be callable");
   }
+  if (typeof type === "function") {
+    [listener, listener.listener] = [type => e => {
+      if (e instanceof type) {
+        listener.listener(e);
+      }
+    }(type), listener];
+    type = Function;
+  }
   let typedListeners = __listeners__.get(emitter);
   if (typedListeners instanceof Map) {
     let listeners = typedListeners.get(type);
@@ -78,14 +86,16 @@ function removeEventListener(emitter, type, listener) {
   if (this !== undefined) {
     [emitter, type, listener] = [this, emitter, type];
   }
+  if (typeof type === "function") {
+    type = Function;
+  }
   let typedListeners = __listeners__.get(emitter);
   if (typedListeners instanceof Map) {
     let listeners = typedListeners.get(type);
     if (listeners instanceof Array) {
-      for (let i = 0, len = listeners.length; i < len; i++) {
-        if (listeners[i] === listener) {
-          listeners.splice(i, 1);
-          break;
+      for (let i = 0; i < listeners.length; i++) {
+        if (listeners[i] === listener || listeners[i].listener === listener) {
+          listeners.splice(i--, 1);
         }
       }
     }
@@ -110,11 +120,15 @@ function dispatchEvent(emitter, event) {
   }
   let typedListeners = __listeners__.get(emitter);
   if (typedListeners instanceof Map) {
-    let listeners = typedListeners.get(event.type);
-    if (listeners instanceof Array) {
-      for (let i = 0, len = listeners.length; i < len; i++) {
-        listeners[i].call(undefined, event);
-      }
+    let listeners = [];
+    if (typedListeners.has(event.type)) {
+      listeners = listeners.concat(typedListeners.get(event.type));
+    }
+    if (typedListeners.has(Function)) {
+      listeners = listeners.concat(typedListeners.get(Function));
+    }
+    for (let i = 0; i < listeners.length; i++) {
+      listeners[i](event);
     }
   }
   return !event.defaultPrevented;

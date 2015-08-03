@@ -72,6 +72,19 @@ function _addEventListener(emitter, type, listener) {
   if (typeof listener !== "function") {
     throw new TypeError("Listener must be callable");
   }
+  if (typeof type === "function") {
+    var _ref2 = [(function (type) {
+      return function (e) {
+        if (e instanceof type) {
+          listener.listener(e);
+        }
+      };
+    })(type), listener];
+    listener = _ref2[0];
+    listener.listener = _ref2[1];
+
+    type = Function;
+  }
   var typedListeners = __listeners__.get(emitter);
   if (typedListeners instanceof Map) {
     var listeners = typedListeners.get(type);
@@ -91,19 +104,21 @@ function _addEventListener(emitter, type, listener) {
 
 function _removeEventListener(emitter, type, listener) {
   if (this !== undefined) {
-    var _ref2 = [this, emitter, type];
-    emitter = _ref2[0];
-    type = _ref2[1];
-    listener = _ref2[2];
+    var _ref3 = [this, emitter, type];
+    emitter = _ref3[0];
+    type = _ref3[1];
+    listener = _ref3[2];
+  }
+  if (typeof type === "function") {
+    type = Function;
   }
   var typedListeners = __listeners__.get(emitter);
   if (typedListeners instanceof Map) {
     var listeners = typedListeners.get(type);
     if (listeners instanceof Array) {
-      for (var i = 0, len = listeners.length; i < len; i++) {
-        if (listeners[i] === listener) {
-          listeners.splice(i, 1);
-          break;
+      for (var i = 0; i < listeners.length; i++) {
+        if (listeners[i] === listener || listeners[i].listener === listener) {
+          listeners.splice(i--, 1);
         }
       }
     }
@@ -116,9 +131,9 @@ function _removeEventListener(emitter, type, listener) {
 
 function _dispatchEvent(emitter, event) {
   if (this !== undefined) {
-    var _ref3 = [this, emitter];
-    emitter = _ref3[0];
-    event = _ref3[1];
+    var _ref4 = [this, emitter];
+    emitter = _ref4[0];
+    event = _ref4[1];
   }
   if (!event) {
     throw new Error("Event must be an object");
@@ -131,11 +146,15 @@ function _dispatchEvent(emitter, event) {
   }
   var typedListeners = __listeners__.get(emitter);
   if (typedListeners instanceof Map) {
-    var listeners = typedListeners.get(event.type);
-    if (listeners instanceof Array) {
-      for (var i = 0, len = listeners.length; i < len; i++) {
-        listeners[i].call(undefined, event);
-      }
+    var listeners = [];
+    if (typedListeners.has(event.type)) {
+      listeners = listeners.concat(typedListeners.get(event.type));
+    }
+    if (typedListeners.has(Function)) {
+      listeners = listeners.concat(typedListeners.get(Function));
+    }
+    for (var i = 0; i < listeners.length; i++) {
+      listeners[i](event);
     }
   }
   return !event.defaultPrevented;

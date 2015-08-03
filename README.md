@@ -1,6 +1,26 @@
 # Yet Another EventEmitter
 
-## ES6 Example
+[![yaee](https://raw.githubusercontent.com/stefanr/yaee/gh-pages/images/yaee.png)](https://www.npmjs.com/package/yaee)
+
+## Installation
+
+```sh
+npm install yaee --save
+```
+
+## Usage
+
+```js
+// ES5
+var yaee = require("yaee");
+
+// ES6
+import {EventEmitter} from "yaee";
+```
+
+## Examples
+
+### ES6
 
 ```js
 import {EventEmitter, CustomEvent} from "yaee";
@@ -64,7 +84,91 @@ my.bar();
 my.my();
 ```
 
-## Node.js Example
+```sh
+> babel-node examples/es6
+foo1 0.4952439935877919
+foo2 0.4952439935877919
+bar 0.4952439935877919
+my 0.4952439935877919
+```
+
+### ES7 - Function bind
+
+```js
+import {addEventListener as on, dispatchEvent, CustomEvent} from "yaee";
+
+function emit(type: string, detail: any): void {
+  this::dispatchEvent(new CustomEvent(type, {detail}));
+}
+
+class Foo {
+  name: string = "foo";
+  setName(name: string): void {
+    let old = this.name;
+    this.name = name;
+    this::emit("nameChanged", {old, name});
+  }
+}
+
+let foo = new Foo();
+foo::on("nameChanged", (e) => {
+  console.log("New name:", e.detail.old, "->", e.detail.name);
+});
+
+foo.setName("bar");
+```
+
+```sh
+> babel-node examples/es7-bind
+New name: foo -> bar
+```
+
+### Type
+
+```js
+import {EventEmitter, CustomEvent} from "yaee";
+
+class MyEvent extends CustomEvent {
+}
+
+class MyEventEmitter extends EventEmitter {
+  doSomething(): void {
+    console.log("doSomething:");
+    this.dispatchEvent(new CustomEvent("something"));
+  }
+  doSomethingElse(): void {
+    console.log("doSomethingElse:");
+    this.dispatchEvent(new MyEvent("something"));
+  }
+}
+
+let my = new MyEventEmitter();
+my.addEventListener("something", () => {
+  console.log("  on:", "'something'");
+});
+my.addEventListener(CustomEvent, () => {
+  console.log("  on:", "CustomEvent");
+});
+my.addEventListener(MyEvent, () => {
+  console.log("  on:", "MyEvent");
+});
+
+my.doSomething();
+my.doSomethingElse();
+```
+
+```sh
+> babel-node examples/type
+doSomething:
+  on: 'something'
+  on: CustomEvent
+doSomethingElse:
+  on: 'something'
+  on: CustomEvent
+  on: MyEvent
+```
+
+### Node
 
 ```js
 var yaee = require("yaee");
@@ -87,15 +191,7 @@ my.on("foo", function (e) {
 my.foo();
 ```
 
-## Node.js Shim Example
-
-```js
-var yaee = require("yaee");
-require("yaee/node-shim")(yaee);
-
-process.addEventListener("foo", function (e) {
-  console.log("foo", e.emitter.pid);
-});
-
-process.dispatchEvent(new yaee.Event("foo"));
+```sh
+> babel-node examples/node
+foo 0.7281268276274204
 ```
