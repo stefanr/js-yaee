@@ -3,7 +3,7 @@
  */
 
 /**
- * Listeners
+ * Global
  */
 "use strict";
 
@@ -15,11 +15,131 @@ var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_ag
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
+exports.getEventListeners = _getEventListeners;
+exports.addEventListener = _addEventListener;
+exports.removeEventListener = _removeEventListener;
+exports.dispatchEvent = _dispatchEvent;
+
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var __listeners__ = new WeakMap();
+var __global__ = (function () {
+  if (typeof window !== "undefined" && window instanceof window.Window) {
+    return window;
+  } else if (typeof global !== "undefined") {
+    return global;
+  }
+  return Object.create(null);
+})();
+
+/**
+ * Symbols
+ */
+var SYM_LISTENERS = Symbol["for"]("yaee.__listeners__");
+
+/**
+ * Listeners
+ */
+var __listeners__ = (function () {
+  if (!__global__[SYM_LISTENERS]) {
+    Object.defineProperty(__global__, SYM_LISTENERS, {
+      value: new WeakMap()
+    });
+  }
+  return __global__[SYM_LISTENERS];
+})();
+
+/**
+ * getEventListeners
+ */
+
+function _getEventListeners(emitter) {
+  return __listeners__.get(emitter);
+}
+
+/**
+ * addEventListener
+ */
+
+function _addEventListener(emitter, type, listener) {
+  if (this !== undefined) {
+    var _ref = [this, emitter, type];
+    emitter = _ref[0];
+    type = _ref[1];
+    listener = _ref[2];
+  }
+  if (typeof listener !== "function") {
+    throw new TypeError("Listener must be callable");
+  }
+  var typedListeners = __listeners__.get(emitter);
+  if (typedListeners instanceof Map) {
+    var listeners = typedListeners.get(type);
+    if (listeners instanceof Array) {
+      listeners.push(listener);
+    } else {
+      typedListeners.set(type, [listener]);
+    }
+  } else {
+    __listeners__.set(emitter, new Map([[type, [listener]]]));
+  }
+}
+
+/**
+ * removeEventListener
+ */
+
+function _removeEventListener(emitter, type, listener) {
+  if (this !== undefined) {
+    var _ref2 = [this, emitter, type];
+    emitter = _ref2[0];
+    type = _ref2[1];
+    listener = _ref2[2];
+  }
+  var typedListeners = __listeners__.get(emitter);
+  if (typedListeners instanceof Map) {
+    var listeners = typedListeners.get(type);
+    if (listeners instanceof Array) {
+      for (var i = 0, len = listeners.length; i < len; i++) {
+        if (listeners[i] === listener) {
+          listeners.splice(i, 1);
+          break;
+        }
+      }
+    }
+  }
+}
+
+/**
+ * dispatchEvent
+ */
+
+function _dispatchEvent(emitter, event) {
+  if (this !== undefined) {
+    var _ref3 = [this, emitter];
+    emitter = _ref3[0];
+    event = _ref3[1];
+  }
+  if (!event) {
+    throw new Error("Event must be an object");
+  }
+  if (!event.type) {
+    throw new Error("Missing event type");
+  }
+  if (event instanceof Event) {
+    event.defineProperty("emitter", emitter);
+  }
+  var typedListeners = __listeners__.get(emitter);
+  if (typedListeners instanceof Map) {
+    var listeners = typedListeners.get(event.type);
+    if (listeners instanceof Array) {
+      for (var i = 0, len = listeners.length; i < len; i++) {
+        listeners[i].call(undefined, event);
+      }
+    }
+  }
+  return !event.defaultPrevented;
+}
 
 /**
  * EventEmitter
@@ -33,64 +153,22 @@ var EventEmitter = (function () {
   _createClass(EventEmitter, [{
     key: "addEventListener",
     value: function addEventListener(type, listener) {
-      if (typeof listener !== "function") {
-        throw new TypeError("Listener must be callable");
-      }
-
-      var typedListeners = __listeners__.get(this);
-      if (typedListeners instanceof Map) {
-        var listeners = typedListeners.get(type);
-        if (listeners instanceof Array) {
-          listeners.push(listener);
-        } else {
-          typedListeners.set(type, [listener]);
-        }
-      } else {
-        __listeners__.set(this, new Map([[type, [listener]]]));
-      }
+      _addEventListener.call(this, type, listener);
     }
   }, {
     key: "removeEventListener",
     value: function removeEventListener(type, listener) {
-      var typedListeners = __listeners__.get(this);
-      if (typedListeners instanceof Map) {
-        var listeners = typedListeners.get(type);
-        if (listeners instanceof Array) {
-          for (var i = 0, len = listeners.length; i < len; i++) {
-            if (listeners[i] === listener) {
-              listeners.splice(i, 1);
-              break;
-            }
-          }
-        }
-      }
+      _removeEventListener.call(this, type, listener);
     }
   }, {
     key: "dispatchEvent",
     value: function dispatchEvent(event) {
-      if (!event) {
-        throw new Error("Event must be an object");
-      }
-      if (!event.type) {
-        throw new Error("Missing event type");
-      }
-      Event.prototype.defineProperty.call(event, "emitter", this);
-
-      var typedListeners = __listeners__.get(this);
-      if (typedListeners instanceof Map) {
-        var listeners = typedListeners.get(event.type);
-        if (listeners instanceof Array) {
-          for (var i = 0, len = listeners.length; i < len; i++) {
-            listeners[i].call(undefined, event);
-          }
-        }
-      }
-      return !event.defaultPrevented;
+      return _dispatchEvent.call(this, event);
     }
   }, {
     key: "on",
     value: function on(type, listener) {
-      EventEmitter.prototype.addEventListener.call(this, type, listener);
+      _addEventListener.call(this, type, listener);
       return this;
     }
   }, {
@@ -100,15 +178,15 @@ var EventEmitter = (function () {
         args[_key - 1] = arguments[_key];
       }
 
-      var event = new CustomEvent(type, {
+      _dispatchEvent.call(this, new CustomEvent(type, {
         detail: args.length < 2 ? args[0] : args
-      });
-      return EventEmitter.prototype.dispatchEvent.call(this, event);
+      }));
+      return true;
     }
   }], [{
     key: "getEventListeners",
     value: function getEventListeners(emitter) {
-      return __listeners__.get(emitter);
+      return _getEventListeners(emitter);
     }
   }]);
 
@@ -176,6 +254,7 @@ var CustomEvent = (function (_Event) {
     _classCallCheck(this, CustomEvent);
 
     _get(Object.getPrototypeOf(CustomEvent.prototype), "constructor", this).call(this, type, init);
+    this.detail = null;
     this.defineProperty("detail", init && init.detail || null);
   }
 

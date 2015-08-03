@@ -1,4 +1,8 @@
-var yaee = require("yaee");
+/*
+ * Yet Another EventEmitter
+ * Example : node
+ */
+var yaee = require("..");
 
 var my = Object.create(yaee.EventEmitter.prototype, {
   myValue: {

@@ -1,12 +1,16 @@
-import {EventEmitter, CustomEvent} from "yaee";
+/*
+ * Yet Another EventEmitter
+ * Example : es6
+ */
+import {EventEmitter, CustomEvent} from "..";
 
 class MyEvent extends CustomEvent {
 
   myValue: any;
 
-  constructor(type: string, eventInit: object) {
-    super(type, eventInit);
-    this.defineProperty("myValue", eventInit && eventInit.myValue);
+  constructor(type: string, init: object) {
+    super(type, init);
+    this.defineProperty("myValue", init && init.myValue);
   }
 
   static create(type: string, myValue: any): MyEvent {

@@ -1,6 +1,6 @@
 {
   "name": "yaee",
-  "version": "0.1.1-beta.2",
+  "version": "0.1.2",
   "description": "Yet Another EventEmitter",
   "keywords": [
     "event",

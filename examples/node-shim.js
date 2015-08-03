@@ -1,5 +1,9 @@
-var yaee = require("yaee");
-require("yaee/node-shim")(yaee);
+/*
+ * Yet Another EventEmitter
+ * Example : node-shim
+ */
+var yaee = require("..");
+require("../shim");
 
 process.addEventListener("foo", function (e) {
   console.log("foo", e.emitter.pid);
