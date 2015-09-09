@@ -1,12 +1,8 @@
 define(["exports"], function (exports) {
   /*
-   * Yet Another EventEmitter
-   * Node.js
+   * yaee
    */
 
-  /**
-   * shim
-   */
   "use strict";
 
   Object.defineProperty(exports, "__esModule", {

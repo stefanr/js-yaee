@@ -1,10 +1,7 @@
 /*
- * Yet Another EventEmitter
+ * yaee
  */
 
-/**
- * Global
- */
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -24,43 +21,35 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var YAEE_SYM = Symbol["for"]("yaee[\"0.1\"]");
+
 var __global__ = (function () {
-  if (typeof window !== "undefined" && window instanceof window.Window) {
+  if (typeof window !== "undefined") {
     return window;
-  } else if (typeof global !== "undefined") {
+  }
+  if (typeof global !== "undefined") {
     return global;
   }
   return Object.create(null);
 })();
 
-/**
- * Symbols
- */
-var SYM_LISTENERS = Symbol["for"]("yaee.__listeners__");
-
-/**
- * Listeners
- */
-var __listeners__ = (function () {
-  if (!__global__[SYM_LISTENERS]) {
-    Object.defineProperty(__global__, SYM_LISTENERS, {
-      value: new WeakMap()
-    });
+var __yaee__ = (function (__global__) {
+  if (!__global__[YAEE_SYM]) {
+    Object.defineProperty(__global__, YAEE_SYM, { value: Object.create(null) });
   }
-  return __global__[SYM_LISTENERS];
-})();
+  return __global__[YAEE_SYM];
+})(__global__);
 
-/**
- * getEventListeners
- */
+var __listeners__ = (function (__yaee__) {
+  if (!__yaee__.listeners) {
+    Object.defineProperty(__yaee__, "listeners", { value: new WeakMap() });
+  }
+  return __yaee__.listeners;
+})(__yaee__);
 
 function _getEventListeners(emitter) {
   return __listeners__.get(emitter);
 }
-
-/**
- * addEventListener
- */
 
 function _addEventListener(emitter, type, listener) {
   if (this !== undefined) {
@@ -98,10 +87,6 @@ function _addEventListener(emitter, type, listener) {
   }
 }
 
-/**
- * removeEventListener
- */
-
 function _removeEventListener(emitter, type, listener) {
   if (this !== undefined) {
     var _ref3 = [this, emitter, type];
@@ -124,10 +109,6 @@ function _removeEventListener(emitter, type, listener) {
     }
   }
 }
-
-/**
- * dispatchEvent
- */
 
 function _dispatchEvent(emitter, event) {
   if (this !== undefined) {
@@ -159,10 +140,6 @@ function _dispatchEvent(emitter, event) {
   }
   return !event.defaultPrevented;
 }
-
-/**
- * EventEmitter
- */
 
 var EventEmitter = (function () {
   function EventEmitter() {
@@ -214,10 +191,6 @@ var EventEmitter = (function () {
 
 exports.EventEmitter = EventEmitter;
 
-/**
- * Event
- */
-
 var Event = (function () {
   function Event(type, init) {
     _classCallCheck(this, Event);
@@ -261,10 +234,6 @@ var Event = (function () {
 })();
 
 exports.Event = Event;
-
-/**
- * CustomEvent
- */
 
 var CustomEvent = (function (_Event) {
   _inherits(CustomEvent, _Event);

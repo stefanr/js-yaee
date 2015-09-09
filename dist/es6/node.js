@@ -1,11 +1,7 @@
 /*
- * Yet Another EventEmitter
- * Node.js
+ * yaee
  */
 
-/**
- * shim
- */
 "use strict";
 
 export { shim };

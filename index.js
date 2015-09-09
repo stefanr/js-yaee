@@ -1,4 +1,4 @@
 /*
- * Yet Another EventEmitter
+ * yaee
  */
 module.exports = require("./dist/cjs/yaee");

@@ -1,12 +1,5 @@
-# Yet Another EventEmitter
-
-[![yaee](https://raw.githubusercontent.com/stefanr/yaee/gh-pages/images/yaee.png)](https://www.npmjs.com/package/yaee)
-
-## Installation
-
-```sh
-npm install yaee --save
-```
+# [![yaee][yaee-img]][yaee-url]
+**Yet Another EventEmitter.**
 
 ## Usage
 
@@ -19,7 +12,6 @@ import {EventEmitter} from "yaee";
 ```
 
 ## Examples
-
 ### ES6
 
 ```js
@@ -195,3 +187,6 @@ my.foo();
 > babel-node examples/node
 foo 0.7281268276274204
 ```
+
+[yaee-img]: https://raw.githubusercontent.com/stefanr/yaee/gh-pages/images/yaee.png
+[yaee-url]: https://www.npmjs.com/package/yaee

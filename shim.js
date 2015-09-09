@@ -1,6 +1,7 @@
 /*
- * Yet Another EventEmitter
- * Node.js EventEmitter Shim
+ * yaee shim
  */
-var EventEmitter = require("./").EventEmitter;
-module.exports = require("./dist/cjs/node").shim(EventEmitter);
+var shim = require("./dist/cjs/node").shim;
+
+shim(require("./").EventEmitter);
+module.exports = shim;

@@ -1,11 +1,7 @@
 /*
- * Yet Another EventEmitter
- * Node.js
+ * yaee
  */
 
-/**
- * shim
- */
 export function shim(EventEmitter: callable): void {
   let events = require("events");
 

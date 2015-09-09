@@ -1,10 +1,7 @@
 /*
- * Yet Another EventEmitter
+ * yaee
  */
 
-/**
- * Global
- */
 "use strict";
 
 export { getEventListeners };
@@ -15,42 +12,35 @@ export { removeEventListener };
 
 export { dispatchEvent };
 
+const YAEE_SYM = Symbol["for"](`yaee["0.1"]`);
+
 let __global__ = () => {
-  if (typeof window !== "undefined" && window instanceof window.Window) {
+  if (typeof window !== "undefined") {
     return window;
-  } else if (typeof global !== "undefined") {
+  }
+  if (typeof global !== "undefined") {
     return global;
   }
   return Object.create(null);
 }();
 
-/**
- * Symbols
- */
-const SYM_LISTENERS = Symbol["for"]("yaee.__listeners__");
-
-/**
- * Listeners
- */
-let __listeners__ = () => {
-  if (!__global__[SYM_LISTENERS]) {
-    Object.defineProperty(__global__, SYM_LISTENERS, {
-      value: new WeakMap()
-    });
+let __yaee__ = __global__ => {
+  if (!__global__[YAEE_SYM]) {
+    Object.defineProperty(__global__, YAEE_SYM, { value: Object.create(null) });
   }
-  return __global__[SYM_LISTENERS];
-}();
+  return __global__[YAEE_SYM];
+}(__global__);
 
-/**
- * getEventListeners
- */
+let __listeners__ = __yaee__ => {
+  if (!__yaee__.listeners) {
+    Object.defineProperty(__yaee__, "listeners", { value: new WeakMap() });
+  }
+  return __yaee__.listeners;
+}(__yaee__);
 function getEventListeners(emitter) {
   return __listeners__.get(emitter);
 }
 
-/**
- * addEventListener
- */
 function addEventListener(emitter, type, listener) {
   if (this !== undefined) {
     [emitter, type, listener] = [this, emitter, type];
@@ -79,9 +69,6 @@ function addEventListener(emitter, type, listener) {
   }
 }
 
-/**
- * removeEventListener
- */
 function removeEventListener(emitter, type, listener) {
   if (this !== undefined) {
     [emitter, type, listener] = [this, emitter, type];
@@ -102,9 +89,6 @@ function removeEventListener(emitter, type, listener) {
   }
 }
 
-/**
- * dispatchEvent
- */
 function dispatchEvent(emitter, event) {
   if (this !== undefined) {
     [emitter, event] = [this, emitter];
@@ -133,10 +117,6 @@ function dispatchEvent(emitter, event) {
   }
   return !event.defaultPrevented;
 }
-
-/**
- * EventEmitter
- */
 
 class EventEmitter {
 
@@ -170,10 +150,6 @@ class EventEmitter {
 }
 
 export { EventEmitter };
-
-/**
- * Event
- */
 
 class Event {
 
@@ -211,10 +187,6 @@ class Event {
 }
 
 export { Event };
-
-/**
- * CustomEvent
- */
 
 class CustomEvent extends Event {
 

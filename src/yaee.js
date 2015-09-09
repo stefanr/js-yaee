@@ -1,47 +1,34 @@
 /*
- * Yet Another EventEmitter
+ * yaee
  */
 
-/**
- * Global
- */
-let __global__: object = (() => {
-  if (typeof window !== "undefined" && window instanceof window.Window) {
-    return window;
-  } else if (typeof global !== "undefined") {
-    return global;
-  }
+const YAEE_SYM = Symbol.for(`yaee["0.1"]`);
+
+let __global__ = (() => {
+  if (typeof window !== "undefined") { return window; }
+  if (typeof global !== "undefined") { return global; }
   return Object.create(null);
 })();
 
-/**
- * Symbols
- */
-const SYM_LISTENERS = Symbol.for("yaee.__listeners__");
-
-/**
- * Listeners
- */
-let __listeners__: WeakMap<EventEmitter, Map<string|any, Array>> = (() => {
-  if (!__global__[SYM_LISTENERS]) {
-    Object.defineProperty(__global__, SYM_LISTENERS, {
-      value: new WeakMap(),
-    });
+let __yaee__ = ((__global__) => {
+  if (!__global__[YAEE_SYM]) {
+    Object.defineProperty(__global__, YAEE_SYM, {value: Object.create(null)});
   }
-  return __global__[SYM_LISTENERS];
-})();
+  return __global__[YAEE_SYM];
+})(__global__);
 
-/**
- * getEventListeners
- */
+let __listeners__: WeakMap<EventEmitter, Map<string, Array>> = ((__yaee__) => {
+  if (!__yaee__.listeners) {
+    Object.defineProperty(__yaee__, "listeners", {value: new WeakMap()});
+  }
+  return __yaee__.listeners;
+})(__yaee__);
+
 export function getEventListeners(emitter: any): Map<string, Array> {
   return __listeners__.get(emitter);
 }
 
-/**
- * addEventListener
- */
-export function addEventListener(emitter: any, type: string|any, listener: callable): void {
+export function addEventListener(emitter: any, type: string, listener: callable): void {
   if (this !== undefined) {
     [emitter, type, listener] = [this, emitter, type];
   }
@@ -69,10 +56,7 @@ export function addEventListener(emitter: any, type: string|any, listener: calla
   }
 }
 
-/**
- * removeEventListener
- */
-export function removeEventListener(emitter: any, type: string|any, listener: callable): void {
+export function removeEventListener(emitter: any, type: string, listener: callable): void {
   if (this !== undefined) {
     [emitter, type, listener] = [this, emitter, type];
   }
@@ -92,9 +76,6 @@ export function removeEventListener(emitter: any, type: string|any, listener: ca
   }
 }
 
-/**
- * dispatchEvent
- */
 export function dispatchEvent(emitter: any, event: Event): boolean {
   if (this !== undefined) {
     [emitter, event] = [this, emitter];
@@ -124,9 +105,6 @@ export function dispatchEvent(emitter: any, event: Event): boolean {
   return !event.defaultPrevented;
 }
 
-/**
- * EventEmitter
- */
 export class EventEmitter {
 
   static getEventListeners(emitter: any): Map<string, Array> {
@@ -158,9 +136,6 @@ export class EventEmitter {
   }
 }
 
-/**
- * Event
- */
 export class Event {
 
   type: string = null;
@@ -196,9 +171,6 @@ export class Event {
   }
 }
 
-/**
- * CustomEvent
- */
 export class CustomEvent extends Event {
 
   detail: any = null;
