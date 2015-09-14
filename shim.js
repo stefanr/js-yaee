@@ -3,5 +3,5 @@
  */
 var shim = require("./dist/cjs/node").shim;
 
-shim(require("./").EventEmitter);
+shim(require("./dist/cjs").EventEmitter);
 module.exports = shim;

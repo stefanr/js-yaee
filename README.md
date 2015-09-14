@@ -1,5 +1,5 @@
 # [![yaee][yaee-img]][yaee-url]
-**Yet Another EventEmitter.**
+**Yet Another EventEmitter**
 
 ## Usage
 
