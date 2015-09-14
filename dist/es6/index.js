@@ -5,13 +5,9 @@
 "use strict";
 
 export { getEventListeners };
-
 export { addEventListener };
-
 export { removeEventListener };
-
 export { dispatchEvent };
-
 const YAEE_SYM = Symbol["for"](`yaee["0.1"]`);
 
 let __global__ = () => {
@@ -37,6 +33,7 @@ let __listeners__ = __yaee__ => {
   }
   return __yaee__.listeners;
 }(__yaee__);
+
 function getEventListeners(emitter) {
   return __listeners__.get(emitter);
 }
@@ -153,12 +150,6 @@ export { EventEmitter };
 
 class Event {
 
-  type = null;
-  emitter = null;
-
-  defaultPrevented = false;
-  propagationStopped = false;
-
   constructor(type, init) {
     this.defineProperty("type", type);
   }
@@ -189,8 +180,6 @@ class Event {
 export { Event };
 
 class CustomEvent extends Event {
-
-  detail = null;
 
   constructor(type, init) {
     super(type, init);
