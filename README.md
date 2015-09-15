@@ -1,6 +1,8 @@
 # [![yaee][yaee-img]][yaee-url]
 **Yet Another EventEmitter**
 
+[![npm version][npm-img]][npm-url] [![npm downloads][dlm-img]][npm-url] [![build status][travis-img]][travis-url]
+
 ## Usage
 
 ```js
@@ -190,3 +192,8 @@ foo 0.7281268276274204
 
 [yaee-img]: https://raw.githubusercontent.com/stefanr/yaee/gh-pages/images/yaee.png
 [yaee-url]: https://www.npmjs.com/package/yaee
+[npm-img]: http://img.shields.io/npm/v/yaee.svg
+[dlm-img]: https://img.shields.io/npm/dm/yaee.svg
+[npm-url]: https://npmjs.org/package/yaee
+[travis-img]: https://travis-ci.org/stefanr/node-yaee.svg
+[travis-url]: https://travis-ci.org/stefanr/node-yaee
